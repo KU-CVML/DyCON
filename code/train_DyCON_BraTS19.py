@@ -223,7 +223,8 @@ if __name__ == "__main__":
             ema_embedding = F.normalize(ema_embedding, dim=-1)
 
             # Mask contrastive
-            mask_con = F.avg_pool3d(label_batch.float(), kernel_size=args.feature_scaler*4, stride=args.feature_scaler*4)
+            # mask_con = F.avg_pool3d(label_batch.float(), kernel_size=args.feature_scaler*4, stride=args.feature_scaler*4)
+            mask_con = F.interpolate(label_batch.unsqueeze(1).float(), scale_factor=1/(args.feature_scaler * 4), mode='trilinear', align_corners=False).squeeze(1)  # torch.Size([8, 12, 12, 12])
             mask_con = (mask_con > 0.5).float()
             mask_con = mask_con.reshape(B, -1)
             mask_con = mask_con.unsqueeze(1) 
@@ -243,9 +244,9 @@ if __name__ == "__main__":
             # gambling_uncertainty = entropy.view(B, -1) 
 
             teacher_feat = ema_embedding if args.use_teacher_loss else None
-            f_loss = fecl_criterion(feat=stud_embedding,
-                                    mask=mask_con, 
-                                    teacher_feat=teacher_feat,
+            f_loss = fecl_criterion(feat=stud_embedding[labeled_bs:],
+                                    mask=mask_con[labeled_bs:], 
+                                    teacher_feat=teacher_feat[labeled_bs:],
                                     gambling_uncertainty=None, # gambling_uncertainty
                                     epoch=epoch_num)
             u_loss = uncl_criterion(stud_logits, ema_logits, beta)
