@@ -144,10 +144,10 @@ class Upsampling(nn.Module):
 
 
 class VNet(nn.Module):
-    def __init__(self, n_channels=3, n_classes=2, n_filters=16, scale_factor=4, normalization='none', use_assp=False, has_dropout=False):
+    def __init__(self, n_channels=3, n_classes=2, n_filters=16, scale_factor=4, normalization='none', use_aspp=False, has_dropout=False):
         super(VNet, self).__init__()
         self.has_dropout = has_dropout
-        self.use_assp = use_assp
+        self.use_aspp = use_assp
         self.scale_factor = scale_factor
 
         self.block_one = ConvBlock(1, n_channels, n_filters, normalization=normalization)
